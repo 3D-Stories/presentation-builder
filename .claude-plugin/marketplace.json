@@ -1,0 +1,22 @@
+{
+  "name": "3D-Stories",
+  "owner": {
+    "name": "Chris Androsoff",
+    "email": "chris@3dstories.ca"
+  },
+  "metadata": {
+    "description": "3D-Stories Claude Code plugins",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "presentation-builder",
+      "description": "End-to-end presentation creation through structured phases: research, requirements, multi-agent review, visual generation, and iterative build. Supports PPTX, HTML, PDF, and DOCX via document-skills.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/presentation-builder"
+      ]
+    }
+  ]
+}
