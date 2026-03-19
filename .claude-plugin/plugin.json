@@ -1,0 +1,8 @@
+{
+  "name": "presentation-builder",
+  "version": "1.0.0",
+  "description": "End-to-end presentation creation through structured phases: research, requirements, multi-agent review, visual generation, and iterative build. Supports PPTX, HTML, PDF, and DOCX via document-skills.",
+  "author": "Chris Androsoff",
+  "repository": "https://github.com/3D-Stories/presentation-builder",
+  "license": "MIT"
+}
