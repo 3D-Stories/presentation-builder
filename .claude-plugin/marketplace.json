@@ -13,7 +13,7 @@
       "name": "presentation-builder",
       "description": "End-to-end presentation creation through structured phases: research, requirements, multi-agent review, visual generation, and iterative build. Supports PPTX, HTML, PDF, and DOCX via document-skills.",
       "source": "./",
-      "strict": false,
+      "strict": true,
       "skills": [
         "./skills/presentation-builder"
       ]

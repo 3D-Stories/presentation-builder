@@ -1,7 +1,7 @@
 {
   "name": "presentation-builder",
   "version": "1.0.0",
-  "description": "End-to-end presentation creation through structured phases: research, requirements, multi-agent review, visual generation, and iterative build. Supports PPTX, HTML, PDF, and DOCX via document-skills.",
+  "description": "End-to-end presentation creation through structured phases: research, requirements, multi-agent review, visual generation, and iterative build.",
   "author": {
     "name": "Chris Androsoff",
     "email": "chris@3dstories.ca"
