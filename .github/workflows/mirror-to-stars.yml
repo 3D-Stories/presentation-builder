@@ -13,4 +13,8 @@ jobs:
           fetch-depth: 0
 
       - name: Push to STARS private mirror
-        run: git push https://x-access-token:${{ secrets.STARS_PAT }}@github.com/STARSAirAmbulance/presentation-builder-private.git HEAD:main
+        env:
+          STARS_PAT: ${{ secrets.STARS_PAT }}
+        run: |
+          PAT=$(echo "$STARS_PAT" | tr -d '[:space:]')
+          git push "https://x-access-token:${PAT}@github.com/STARSAirAmbulance/presentation-builder-private.git" HEAD:main
