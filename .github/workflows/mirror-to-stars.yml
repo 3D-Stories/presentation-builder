@@ -12,6 +12,16 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Diagnostic - verify PAT
+        env:
+          STARS_PAT: ${{ secrets.STARS_PAT }}
+        run: |
+          PAT=$(echo "$STARS_PAT" | tr -d '[:space:]')
+          echo "PAT length: ${#PAT}"
+          echo "PAT prefix: ${PAT:0:10}..."
+          echo "Testing git ls-remote..."
+          git ls-remote "https://x-access-token:${PAT}@github.com/STARSAirAmbulance/presentation-builder-private.git" HEAD 2>&1 || echo "ls-remote FAILED"
+
       - name: Push to STARS private mirror
         env:
           STARS_PAT: ${{ secrets.STARS_PAT }}
