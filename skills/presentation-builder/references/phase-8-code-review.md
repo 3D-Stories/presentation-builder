@@ -62,6 +62,48 @@ Focus on:
 - Terse speaker notes — notes that are stage directions rather than
   speakable talking points. Reference `references/presentation-best-practices.md`
   for the "good notes (speakable script)" standard.
+- **pptxgenjs API gotchas** (see checklist below) — each one has been
+  observed to ship undetected by a less-rigorous Phase 8 review.
+
+## pptxgenjs API gotcha checklist (PPTX format only)
+
+Before marking Phase 8 complete for PPTX builds, grep each build-deck
+file against these patterns. Each gotcha has caused a real runtime
+build failure in prior evaluations.
+
+1. **Shape constant casing.** The pptxgenjs shape enum is UPPERCASE.
+   `ShapeType.line` throws "Missing/Invalid shape parameter"; the
+   correct form is `ShapeType.LINE`. Check every `addShape` /
+   `ShapeType.` call and every string literal shape name. Common
+   offenders: `line`, `rect`, `ellipse`, `roundRect` (must be
+   `ROUND_RECT`).
+
+2. **Image path references match disk.** Every `addImage({ path: ... })`
+   reference must resolve to an actual file. Cross-check the
+   build-deck's `addImage` calls against `ls images/` output. If Phase 6
+   produced `01-title-hero.jpg` but the build script references
+   `01-hero.jpg`, the build fails with `ENOENT`.
+
+3. **Hex color format.** pptxgenjs expects `"0891B2"` (no `#` prefix).
+   `"#0891B2"` is silently ignored or renders wrong.
+
+4. **Font size is a number, not a string.** `fontSize: 24` works;
+   `fontSize: "24"` may silently fail or render at default size.
+
+5. **Slide-file indexing consistency.** If `slides-s1.js` exports
+   `addSection1Slides`, make sure `build.js` imports and calls it
+   correctly. Off-by-one errors on `s0` vs `s1` naming are common
+   when sections are added incrementally.
+
+6. **Placeholder text left on slides.** If a stat was unavailable
+   during Phase 2 (e.g., "TBD: conversion rate") and the placeholder
+   string was carried into the build script verbatim, it will appear
+   on the rendered slide. Either replace with the real number or
+   remove the slide/bullet entirely. Do not ship `[TODO]`, `[TBD]`,
+   or `[placeholder]` text on finished decks.
+
+Mark each gotcha PASS/FAIL in the Phase 8 review log. A gotcha-level
+FAIL is always a Must-fix.
 
 ## Review log location (canonical)
 
