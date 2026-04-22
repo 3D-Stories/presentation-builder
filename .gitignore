@@ -1,0 +1,9 @@
+# Rawgentic project-local config
+.rawgentic.json
+
+# Iteration-1 eval workspace (never committed; pre-hardening baseline,
+# superseded by iteration-2/iteration-3 results already in repo)
+presentation-builder-workspace/iteration-1/
+
+# Node
+node_modules/
