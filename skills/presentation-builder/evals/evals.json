@@ -1,0 +1,42 @@
+{
+  "skill_name": "presentation-builder",
+  "iteration": 2,
+  "evals": [
+    {
+      "id": 1,
+      "name": "team-update",
+      "prompt": "Make me a 5-slide team update on our Q4 website redesign — standup tomorrow, super informal, just the highlights of what shipped.",
+      "fixture": "empty",
+      "expected_path": "Quick",
+      "files": [],
+      "expectations": ["B3", "B4", "B5", "B6", "B9", "B12", "B13", "B14", "B18"]
+    },
+    {
+      "id": 2,
+      "name": "auth-migration",
+      "prompt": "I need to give a 20-minute talk at our engineering all-hands about the auth migration we just finished. Audience is ~40 engineers, mixed seniority. I want to cover what we shipped, the gnarliest bug we hit, and what we'd do differently. PPTX please. I have some notes in this directory.",
+      "fixture": "test-2-auth-migration",
+      "expected_path": "Standard",
+      "files": ["design-doc.md", "postmortem.md", "migration-notes.md"],
+      "expectations": ["B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9", "B10", "B11", "B12", "B13", "B14", "B15", "B16", "B17", "B18"]
+    },
+    {
+      "id": 3,
+      "name": "pitch-deck",
+      "prompt": "Put together a pitch deck for a 15-minute investor meeting about our new consumer fitness app — pre-revenue, seed stage, looking for $2M. Standard 10-12 slide structure, VC audience. I've dropped what I have into this directory.",
+      "fixture": "test-3-pitch-deck",
+      "expected_path": "Complex",
+      "files": ["product-vision.md"],
+      "expectations": ["B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9", "B10", "B11", "B12", "B13", "B14", "B15", "B16", "B17", "B18"]
+    },
+    {
+      "id": 4,
+      "name": "otel-resume",
+      "prompt": "Hey, continue working on my OTel migration deck.",
+      "fixture": "test-4-otel-resume",
+      "expected_path": "Resumption (Phase 3)",
+      "files": ["MATERIALS_INDEX.md", "docs/superpowers/specs/2026-04-15-otel-migration-design.md", "gathered-materials/"],
+      "expectations": ["resumption-detected", "resumed-from-phase-3", "materials-index-preserved", "spec-preserved", "B7", "B8", "B9", "B10", "B11", "B12", "B13", "B14", "B15", "B16", "B17", "B18"]
+    }
+  ]
+}

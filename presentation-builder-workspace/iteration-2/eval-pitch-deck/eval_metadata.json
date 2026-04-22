@@ -1,0 +1,25 @@
+{
+  "eval_id": 3,
+  "eval_name": "pitch-deck",
+  "prompt": "Put together a pitch deck for a 15-minute investor meeting about our new consumer fitness app — pre-revenue, seed stage, looking for $2M. Standard 10-12 slide structure, VC audience. I've dropped what I have into this directory.",
+  "assertions": [
+    "B1: gathered-materials/ has ≥ 1 file AND every indexed file exists",
+    "B2: MATERIALS_INDEX.md contains a Gaps section",
+    "B3: design spec exists with answers to Q1-Q8",
+    "B4: every section has all 6 labelled fields",
+    "B5: cut plan 'not required' (15-min < 20-min threshold)",
+    "B6: if Q8 = full/selective, Replicate MCP is configured",
+    "B7: Review Log Phase 3 has ≥ 3 substantive findings per persona",
+    "B8: every Phase 3 Must-fix has a spec edit or dismissal",
+    "B9: style-guide.md has all 6 required sections",
+    "B10: Review Log Phase 5 has ≥ 3 substantive findings per persona",
+    "B11: every Phase 5 Must-fix has a spec/style-guide edit or dismissal",
+    "B12: if Q8 ≠ text-only, images/ has file per plan",
+    "B13: no IMAGE_PLAN.md in place of generated files",
+    "B14: build.js runs exit 0 and slide count matches",
+    "B15: build was executed before code review",
+    "B16: code-review.md exists with Review Log (Phase 8) containing ≥ 3 substantive findings per persona",
+    "B17: every Phase 8 Must-fix has a code edit or dismissal",
+    "B18: output file exists, size ≥ threshold, slide count matches"
+  ]
+}

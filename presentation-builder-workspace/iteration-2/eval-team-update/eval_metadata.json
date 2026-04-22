@@ -1,0 +1,16 @@
+{
+  "eval_id": 1,
+  "eval_name": "team-update",
+  "prompt": "Make me a 5-slide team update on our Q4 website redesign — standup tomorrow, super informal, just the highlights of what shipped.",
+  "assertions": [
+    "B3: design spec exists and contains answers to Q1-Q8",
+    "B4: every section has all 6 labelled fields",
+    "B5: cut plan present OR explicit 'not required' line (duration likely ≤ 20 min, so 'not required' line expected)",
+    "B6: if Q8 = full/selective, Replicate MCP is configured; otherwise Q8 = text-only and assertion is vacuously true",
+    "B9: style-guide.md exists with all 6 required sections (image-prompts iff Q8 ≠ text-only)",
+    "B12: if Q8 ≠ text-only, images/ has file per plan; otherwise no images/ expected",
+    "B13: no IMAGE_PLAN.md used as completion marker",
+    "B14: build.js runs exit 0 and slide count matches",
+    "B18: output file exists at expected path, size ≥ threshold, slide count matches spec"
+  ]
+}
