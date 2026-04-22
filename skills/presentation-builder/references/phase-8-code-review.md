@@ -71,12 +71,26 @@ Before marking Phase 8 complete for PPTX builds, grep each build-deck
 file against these patterns. Each gotcha has caused a real runtime
 build failure in prior evaluations.
 
-1. **Shape constant casing.** The pptxgenjs shape enum is UPPERCASE.
-   `ShapeType.line` throws "Missing/Invalid shape parameter"; the
-   correct form is `ShapeType.LINE`. Check every `addShape` /
-   `ShapeType.` call and every string literal shape name. Common
-   offenders: `line`, `rect`, `ellipse`, `roundRect` (must be
-   `ROUND_RECT`).
+1. **Shape constant names.** pptxgenjs v4.x uses lowercase/camelCase
+   `ShapeType` constants — `rect`, `roundRect`, `line`, `ellipse`,
+   `diamond`, `arrow`, etc. Uppercase forms like `ShapeType.RECTANGLE`
+   or `ShapeType.LINE` do NOT exist and throw "Missing/Invalid shape
+   parameter" at runtime. Cross-check every `addShape` / `ShapeType.`
+   reference in the build-deck against the actual enum. `ShapeType`
+   lives on the instance, not the default export — write a one-off
+   script to enumerate valid names:
+
+   ```javascript
+   // /tmp/shapetype-check.js
+   const PptxGenJS = require('pptxgenjs');
+   const pres = new PptxGenJS();
+   console.log(Object.keys(pres.ShapeType).sort());
+   ```
+
+   Run with: `NODE_PATH=/home/rocky00717/.npm-global/lib/node_modules node /tmp/shapetype-check.js`
+
+   Any `ShapeType.XXX` reference in the build-deck whose name doesn't
+   appear in that output is a Must-fix.
 
 2. **Image path references match disk.** Every `addImage({ path: ... })`
    reference must resolve to an actual file. Cross-check the
