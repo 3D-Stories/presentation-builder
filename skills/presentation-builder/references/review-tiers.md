@@ -6,6 +6,25 @@ Multi-perspective review is used at three points in the workflow:
 - Phase 8: Implementation code review
 - Ad-hoc: Speaker notes review, image review
 
+## Execution Context Note (iteration 2)
+
+Tier 1 (BMAD party mode) and Tier 2 (Reflexion critique) invoke orchestrated
+sub-agents that require interactive multi-turn execution with the user. In
+single-agent / autonomous sessions (subagents running this skill, headless
+runs, evaluation harnesses), Tier 1 and Tier 2 do not execute reliably —
+they fall through to Tier 3.
+
+**For single-agent / autonomous runs:** default to Tier 3 (built-in fallback
+review from `fallback-review-prompts.md`). This is a deliberate
+reliability-over-quality-ceiling tradeoff.
+
+**For interactive Opus sessions:** Tier 1 is still preferred when available —
+it produces the richest feedback. Tier 2 is next.
+
+The substance expectations (≥ 3 substantive findings per persona, or a
+substantiated waiver — see `fallback-review-prompts.md`) apply to ALL
+tiers. Tier 1's reviewer agents must still hit the same bar.
+
 ## Detection Order
 
 Check for available review tools in this order. Use the FIRST one found:

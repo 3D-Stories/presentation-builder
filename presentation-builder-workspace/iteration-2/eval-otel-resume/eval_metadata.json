@@ -1,0 +1,23 @@
+{
+  "eval_id": 4,
+  "eval_name": "otel-resume",
+  "prompt": "Hey, continue working on my OTel migration deck.",
+  "assertions": [
+    "Resumption detected: prior artifacts (MATERIALS_INDEX.md, design spec) recognized before any new work begins; transcript announces what was found",
+    "Resumed from Phase 3 (Review) — NOT Phase 1 or Phase 2 — per the SKILL.md resumption table",
+    "MATERIALS_INDEX.md not overwritten with different content",
+    "Existing design spec not overwritten",
+    "B7: Review Log Phase 3 has ≥ 3 substantive findings per persona",
+    "B8: every Phase 3 Must-fix has a spec edit or dismissal",
+    "B9: style-guide.md has all 6 required sections",
+    "B10: Review Log Phase 5 has ≥ 3 substantive findings per persona",
+    "B11: every Phase 5 Must-fix has a spec/style-guide edit or dismissal",
+    "B12: if Q8 ≠ text-only, images/ has file per plan",
+    "B13: no IMAGE_PLAN.md in place of generated files",
+    "B14: build.js runs exit 0 and slide count matches",
+    "B15: build was executed before code review",
+    "B16: code-review.md exists with Review Log (Phase 8) containing ≥ 3 substantive findings per persona",
+    "B17: every Phase 8 Must-fix has a code edit or dismissal",
+    "B18: output file exists, size ≥ threshold, slide count matches"
+  ]
+}

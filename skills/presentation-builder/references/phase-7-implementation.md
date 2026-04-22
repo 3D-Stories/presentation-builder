@@ -1,4 +1,4 @@
-# Phase 6: Implementation Scripts
+# Phase 7: Implementation Scripts
 
 ## Purpose
 
@@ -75,6 +75,27 @@ The orchestrator:
 
 Include a comment at the top noting the cut plan for shorter versions.
 
+## document-skills Availability
+
+The `/pptx`, `/pdf`, `/frontend-design`, and `/docx` skills come from the
+document-skills plugin. Setup should have installed it (see `setup.md`),
+but if the plugin is unavailable at build time:
+
+- **For PPTX:** Build with `pptxgenjs` directly using the architecture
+  below. Do NOT stall waiting for `/pptx` — the modular theme.js +
+  slides-s{N}.js + build.js pattern works standalone with just
+  `pptxgenjs` installed (`npm install pptxgenjs`).
+- **For HTML:** Build with plain HTML + CSS + inline JS. Fall back from
+  `/frontend-design` to a static HTML file with the presentation
+  embedded as slides (one `<section>` per slide).
+- **For PDF / DOCX:** If the skill is unavailable, halt and ask the user
+  how to proceed. Unlike PPTX/HTML, these formats don't have a
+  generally-available drop-in library equivalent.
+
+A common Sonnet failure pattern is stalling with "document-skills plugin
+not installed" when PPTX pptxgenjs-direct would have worked. Do not
+stall — fall through to the direct-library path for PPTX/HTML.
+
 ## Architecture (Other Formats)
 
 For non-PPTX formats, the design phase is identical. The implementation phase delegates
@@ -107,3 +128,26 @@ In all cases, maintain the modular principle -- separate files per section.
 - **Assert slide count** -- catch accidental additions/removals
 - **Speaker notes are NOT optional** -- every slide gets the full treatment
 - **Build early, build often** -- run the build script after any change
+
+## Phase 7 — Phase-complete gate
+
+Phase 7 is NOT complete until the following all hold:
+
+1. Build scripts exist at `build-deck/` (theme.js, slides-s{N}.js per
+   section, build.js orchestrator).
+2. Running the build command (e.g., `node build-deck/build.js`) exits
+   with code 0 (no errors).
+3. The generated presentation file exists at the expected path
+   (e.g., `output.pptx`).
+4. The slide count in the generated file matches the spec's total slide
+   count (pptxgenjs assertion in build.js covers this).
+
+NOTE: Phase 9's build gate partially overlaps this one — that is
+intentional. Phase 7 requires that the build was made to work during
+implementation; Phase 9 re-verifies that the final build succeeds after
+any code-review edits. This belt-and-suspenders redundancy is
+deliberate for Sonnet reliability.
+
+A common Sonnet failure pattern is declaring Phase 7 complete with build
+scripts written but never executed. Do NOT advance to Phase 8 with an
+unrun build.
