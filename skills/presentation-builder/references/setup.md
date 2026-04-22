@@ -26,8 +26,12 @@ Wait for reload to complete before continuing.
 
 ### 2. Replicate MCP (for AI Image Generation)
 
+Required when Phase 2 Q8 (Visual Strategy) is `full` or `selective`.
+Skipped when Q8 = `text-only`.
+
+Check current state (both global and project-local):
 ```bash
-grep -q "replicate" ~/.claude/mcp.json 2>/dev/null
+grep -q "replicate" ~/.claude/mcp.json 2>/dev/null || { test -f .mcp.json && grep -q "replicate" .mcp.json 2>/dev/null; }
 ```
 
 If missing, guide the user through setup:
@@ -42,11 +46,12 @@ If missing, guide the user through setup:
 
 Once the user provides the token:
 
-1. Check if `~/.claude/mcp.json` exists
-2. If it exists, read it and MERGE the replicate server config (don't overwrite other servers)
-3. If it doesn't exist, create it
+1. Check if `~/.claude/mcp.json` exists.
+2. If it exists, read it and MERGE the replicate server config (don't overwrite other servers).
+3. If it doesn't exist, create it.
 
 **Config to add/merge:**
+
 ```json
 {
   "mcpServers": {
@@ -62,11 +67,24 @@ Once the user provides the token:
 ```
 
 After writing the config:
+
 > "Replicate MCP configured. Run `/mcp` to reconnect, or restart Claude Code for the changes to take effect."
 
-**If user doesn't want to set up Replicate:**
-> "No problem -- I can design the presentation and create placeholder slides for images.
-> You can add images manually later, or set up Replicate MCP anytime with `/presentation-builder setup`."
+**If the user declines to configure Replicate:**
+
+Do NOT proceed with a silent downgrade. The skill cannot produce AI-generated
+images without Replicate. Offer the user a concrete choice:
+
+> "Without Replicate MCP, the skill cannot generate AI images. I can either:
+> (a) Proceed with Q8 = `text-only` (native shapes/charts/typography only — no AI images), or
+> (b) Pause here so you can configure Replicate later and resume.
+> Which would you prefer?"
+
+If the user chooses (a), change Q8 to `text-only` in the design spec and continue. If the user chooses (b), halt with the reason documented in the transcript.
+
+The prior "I can design the presentation and create placeholder slides
+for images" language has been removed — it was a silent-downgrade path
+that let Sonnet skip image generation without user opt-in.
 
 ### 3. Review Tools (Optional)
 
