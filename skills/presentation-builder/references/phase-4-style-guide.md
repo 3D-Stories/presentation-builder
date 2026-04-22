@@ -50,15 +50,25 @@ Specify which slides use which background:
 - **Light slides:** All content slides
 - **Accent patterns:** Left-border cards, stat callouts, code blocks
 
-### 4. Define Image Generation Prompts
+### 4. Define Image Generation Prompts (conditional on Q8)
 
-Create two prompt prefixes that ALL image generation should use:
+Skip this section entirely if Phase 2 Q8 = `text-only` — the style guide
+should not include AI image-prompt prefixes when no AI images will be
+generated. Instead, add a "Native Visual Patterns" subsection that
+specifies how the deck expresses visual variety without AI images
+(color blocks, typographic hierarchy, shape-based diagrams, icon sets).
+
+Otherwise (Q8 = `full` or `selective`), create TWO prompt prefixes
+that ALL image generation should use:
 
 **For light-background content slides:**
 > "[Style]. [Subject]. On solid white background. [Palette hex codes]. Clean modern style. Centered."
 
 **For dark-background section dividers:**
 > "[Style]. [Subject]. Dark [primary color] background hex [code]. [Palette hex codes]. Clean modern style. Centered."
+
+The prefixes should use specific style and palette descriptors that trace
+back to the color palette chosen in step 1 of this phase.
 
 ### 5. Define Visual Motifs
 
@@ -80,3 +90,21 @@ This file will be read by both the build scripts and the image generation prompt
 - **Dark/light sandwich** -- dark bookend slides, light content middle
 - **Consistent motifs** -- if you use a card pattern, use it everywhere
 - **Present before generating** -- get user approval before any images are created
+
+## Phase 4 — Phase-complete gate
+
+Phase 4 is NOT complete until `style-guide.md` exists AND contains all
+6 required sections:
+
+1. **Color palette** with at least 4 colors (each with hex code and role label).
+2. **Typography table** with at least 4 element types (title, body, code, big-stats, captions, etc.).
+3. **Slide structure patterns** (dark/light slide mapping, accent patterns, etc.).
+4. **Visual motifs** — at least 1 recurring element (card pattern, progress bar, icon style, etc.).
+5. **Image-prompt prefixes** IF Q8 ≠ `text-only`. If Q8 = `text-only`, a
+   "Native Visual Patterns" subsection replaces this.
+6. **File written** — the content above is saved to `style-guide.md` at
+   the project root (not just presented in chat).
+
+A common Sonnet failure pattern is a thin style guide with 3-4 of these
+sections and the rest missing. Do NOT advance to Phase 5 with any
+required section empty or absent.
