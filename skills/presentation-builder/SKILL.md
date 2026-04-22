@@ -147,12 +147,19 @@ takeaway, audience, duration, sections, timing, demos, output format.
 
 ### Phase 3: Multi-Agent Review
 
-Read `references/review-tiers.md` for the tiered review detection process.
+Read `references/review-tiers.md` for the tiered review detection process and
+`references/fallback-review-prompts.md` for the Tier 3 persona prompts,
+substance expectations, and substantiated-waiver format.
 
 Refine the design spec through multi-perspective review using the best available mechanism.
-Apply findings to the spec. Get user approval before proceeding.
 
-**Outputs:** Refined design spec
+**Phase-complete gate:** Phase 3 is NOT complete until:
+1. The design spec contains a "Review Log (Phase 3)" section with ≥ 3 substantive findings per persona (or a substantiated waiver per persona — bare "no issues from this perspective" does NOT satisfy this gate).
+2. Every Must-fix finding has a corresponding spec edit or explicit documented dismissal in the review log.
+
+A common Sonnet failure pattern is producing shallow reviews (one or zero findings per persona) or advancing without applying Must-fix edits. Do NOT advance to Phase 4 in that state.
+
+**Outputs:** Refined design spec with Review Log (Phase 3) section.
 
 ### Phase 4: Style Guide
 
@@ -165,66 +172,103 @@ Present to user for approval before generating any images.
 
 ### Phase 5: Design Review
 
-Run another review pass on the complete design (spec + style guide) using the same tiered
-mechanism from Phase 3. For Complex presentations, use full multi-agent review.
-For Quick/Standard, an inline check is sufficient.
+Run another review pass, this time on the complete design (spec + style guide together) using the same tiered mechanism from Phase 3.
 
-**Outputs:** Final approved spec + style guide
+For Complex presentations, use full multi-agent review. For Quick/Standard, an inline check is sufficient — but substance expectations and the substantiated-waiver rule still apply.
+
+**Phase-complete gate:** Phase 5 is NOT complete until:
+1. The spec contains a "Review Log (Phase 5)" section with ≥ 3 substantive findings per persona (or substantiated waiver), reviewing spec + style-guide together.
+2. Every Must-fix finding has a corresponding spec/style-guide edit or explicit dismissal.
+
+**Outputs:** Final approved spec + style guide with Review Log (Phase 5) section.
 
 ### Phase 6: Visual Generation
 
-Read `references/phase-6-visuals.md` for the detailed process.
+**Hard prerequisite:** Replicate MCP configured and working AND Q8 ≠ `text-only`.
+If Replicate is absent, STOP (Phase 2 should have caught this — see setup re-entry path in `references/phase-2-requirements.md`).
+If Q8 = `text-only`, skip Phase 6 entirely and advance to Phase 7.
 
-**Summary:** Generate images using `/generate-image` skill (or direct Replicate MCP calls) with
-the style guide's prompt prefixes. Plan ALL images before generating. Batch in groups of 4.
-Handle background removal for images on light slides.
+Read `references/phase-6-visuals.md` and follow it end-to-end. This phase is not complete until `images/` contains one file per image in the style guide's plan. Writing `IMAGE_PLAN.md` without files on disk is a known failure mode — do not advance to Phase 7 in that state.
 
 **Important:** This phase runs BEFORE implementation because build scripts reference image paths.
 
-**Outputs:** `images/` directory with all generated assets
+**Outputs:** `images/` directory with all generated assets (unless Q8 = `text-only`).
 
 ### Phase 7: Implementation Scripts
 
 Read `references/phase-7-implementation.md` for the detailed process.
 
-**Summary:** Build the presentation using a modular architecture. Delegate to the appropriate
+**Summary:** Build the presentation using modular scripts. Delegate to the
 document-skills skill for the chosen format:
-- **PPTX:** `/pptx` skill (pptxgenjs)
-- **HTML:** `/frontend-design` skill
-- **PDF:** `/pdf` skill
-- **DOCX:** `/docx` skill
+- **PPTX:** `/pptx` skill (pptxgenjs). **Fallback:** if `/pptx` is
+  unavailable, use `pptxgenjs` directly with the modular theme.js +
+  slides-s{N}.js + build.js architecture. Do NOT stall — this is a
+  documented fall-through.
+- **HTML:** `/frontend-design` skill. **Fallback:** plain HTML+CSS+JS.
+- **PDF:** `/pdf` skill.
+- **DOCX:** `/docx` skill.
 
 For PPTX: `theme.js` + `slides-s{N}.js` per section + `build.js` orchestrator.
 
 Speaker notes are NOT optional. Every slide gets the full treatment. Read
-`references/presentation-best-practices.md` for the speaker notes format and common patterns.
+`references/presentation-best-practices.md` for the speaker notes format.
 
-**After building:** Do a dedicated speaker notes review pass. Initial notes tend to be terse
-"stage directions." The review should transform them into speakable talking points with pacing
-cues, audience callouts, and transitions. Use the tiered review mechanism for this.
+**Phase-complete gate:** Phase 7 is not complete until `build.js` runs with
+zero errors and produces a presentation file of the expected slide count.
+See `references/phase-7-implementation.md` for details.
 
-**Outputs:** Build scripts in `build-deck/` directory
+**Outputs:** Build scripts in `build-deck/` directory + generated presentation file.
 
 ### Phase 8: Code Review
 
-Review build scripts for correctness and spec conformance. Read `references/review-tiers.md`.
+Read `references/phase-8-code-review.md` for the detailed process, including the MANDATORY pre-review build run.
 
-For Complex presentations (>15 slides): Full multi-agent review.
-Check for: runtime errors, layout overflow, style guide deviations, spec gaps, dead code,
-terse speaker notes.
+**Summary:** Run the build FIRST (capture exit code, stderr/stdout, file size). Then review build scripts via the tiered review mechanism (see `references/review-tiers.md`). Apply Must-fix findings.
 
-Fix all issues, then test build to verify zero errors and correct slide count.
+**Phase-complete gate:** Phase 8 is NOT complete until:
+1. Build was executed with captured output.
+2. Latest build run exits with code 0.
+3. `code-review.md` exists at project root with "Review Log (Phase 8)" section containing ≥ 3 substantive findings per persona (or substantiated waivers).
+4. Every Must-fix finding has a code edit applied or explicit dismissal.
 
-**Outputs:** Verified, building scripts
+A common Sonnet failure pattern is reviewing code without running the build. Do NOT advance to Phase 9 in that state.
+
+**Outputs:** Verified build scripts + `code-review.md` with Review Log (Phase 8).
 
 ### Phase 9: Build & Iterate
 
-1. Run the build script to generate the presentation file
-2. Verify: correct slide count, no errors
-3. Present to user for review
-4. Iterate based on feedback (targeted fixes, not full rewrites)
+Run the build script to generate the presentation file:
 
-**Outputs:** Final presentation file
+```bash
+cd build-deck && node build.js
+```
+
+**Phase-complete gate:** Phase 9 is NOT complete until:
+
+1. The output file exists at the expected path (e.g., `output.pptx`).
+2. The output file size exceeds the minimum threshold:
+   - PPTX: ≥ 10 KB
+   - PDF: ≥ 5 KB
+   - DOCX: ≥ 5 KB
+   - HTML: ≥ 5 KB
+3. The slide count in the output matches the spec's total slide count
+   (pptxgenjs' built-in assertion in `build.js` covers this; parse the
+   generated file for other formats if needed).
+4. The build invocation is recorded in the transcript (exit code captured).
+
+NOTE: Phase 7's build gate partially overlaps this one — that is
+intentional. Phase 7 requires the build was made to work during
+implementation; Phase 9 re-verifies the final build after any code-review
+edits. Belt-and-suspenders redundancy is deliberate for Sonnet reliability.
+
+A common Sonnet failure pattern is declaring Phase 9 complete based on
+build scripts existing rather than on actually running them. Do NOT skip
+the build invocation — the build script must execute and produce a file
+on disk that passes the size and slide-count checks.
+
+Iterate based on user feedback using the iteration protocol below.
+
+**Outputs:** Final presentation file.
 
 ## Iteration Protocol
 
