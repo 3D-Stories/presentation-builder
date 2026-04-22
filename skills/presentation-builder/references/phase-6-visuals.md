@@ -5,50 +5,54 @@
 Phase 6 runs ONLY when Q8 (Visual Strategy) is `full` or `selective`.
 If Q8 = `text-only`, SKIP this phase entirely and advance to Phase 7.
 
-If Q8 ≠ `text-only` AND Replicate MCP is NOT configured, STOP. Do NOT
-proceed. Do NOT produce an `IMAGE_PLAN.md` as a substitute. An empty
-`images/` directory is not acceptable output. Phase 2 should have
-caught this via the setup re-entry path — if it wasn't caught, halt
-here and ask the user to configure Replicate now.
+If Q8 ≠ `text-only` AND the `/generate-image` skill is not available
+(Replicate MCP not configured), STOP. Do NOT proceed. Do NOT produce an
+`IMAGE_PLAN.md` as a substitute. An empty `images/` directory is not
+acceptable output. Phase 2 should have caught this via the setup re-entry
+path — if it wasn't caught, halt here and ask the user to run
+`/generate-image:setup` now.
 
 ## Process
 
+Image generation is delegated to the `/generate-image` skill. That skill
+owns Replicate MCP calls, model selection (Nano Banana 2 vs FLUX Schnell),
+and the two-step transparency pipeline (generate on white → background
+removal). This Phase 6 file tells you WHAT to generate; `/generate-image`
+tells you HOW.
+
 Read `style-guide.md`. It defines the image plan (which slides get images,
-with what prompts, at what aspect ratio). For each image in the plan:
+with what prompts, at what aspect ratio). For each image in the plan,
+invoke the `/generate-image` skill with:
 
-1. **Generate.** Call `mcp__replicate__create_predictions` with:
-   - `model`: `"google/nano-banana-2"` (production quality) or
-     `"black-forest-labs/flux-schnell"` (quick drafts when iterating on
-     concepts)
-   - `input.prompt`: `<style guide's prompt prefix> + <image subject
-     description from the plan>`
-   - `input.aspect_ratio`: `"16:9"` (or `"4:3"` if the style guide
-     specifies it)
+- **Prompt:** The style guide's prompt prefix (light-bg or dark-bg variant,
+  per the "Skip rules" section below) + the image subject description from
+  the plan.
+- **Aspect ratio:** `16:9` by default, or `4:3` if the style guide specifies.
+- **Transparency:** Request transparent PNG (triggers automatic bg removal)
+  ONLY for light-background slides where the image will sit on an
+  off-white card — see "Skip rules" below. Dark section-divider images
+  should NOT request transparency.
+- **Output path:** `images/NN-<slug>.{jpg|png}` where `NN` is the slide
+  number (zero-padded) and `<slug>` is a short kebab-case name from the
+  plan. Use `.png` when transparency was requested (it's already a
+  transparent PNG); use `.jpg` for full-bleed dark backgrounds.
 
-2. **Download.** Call `mcp__replicate__download_files` and save the
-   result to `images/NN-<slug>.jpg`, where `NN` is the slide number
-   (zero-padded) and `<slug>` is a short kebab-case name from the
-   plan.
-
-3. **Background-remove** for slides with a light background
-   (content slides). Call `mcp__replicate__create_predictions` with:
-   - `model`: `"recraft-ai/recraft-remove-background"`
-   - `input.image`: the generated image file
-   Then download to `images/NN-<slug>.png` (same slug, different
-   extension). Update the build script's image reference.
-
-Batch 4 image generations in parallel — call `create_predictions` four
-times in the same message, wait for all four to complete, then download
-all four, then proceed to the next batch of 4.
+Batch 4 images in parallel — invoke `/generate-image` four times in the
+same message, wait for all four to complete, then proceed to the next batch.
 
 ## Skip rules for background removal
 
-- **Skip** for dark section-divider images (used as full-bleed backgrounds).
-- **Skip** for full-infographic images where the background IS the design.
-- **Skip** for charts or diagrams with colored bands that would be damaged.
-- **Always run** for character illustrations on light slides.
-- **Always run** for icon/flow diagrams on light slides.
-- **Always run** for any illustration with a distinct white background on
+These rules decide whether to request transparency when invoking
+`/generate-image`. (The `/generate-image` skill handles the two-step
+pipeline itself once you've requested transparency — you do not call the
+background-removal model directly from here.)
+
+- **No transparency** for dark section-divider images (used as full-bleed backgrounds).
+- **No transparency** for full-infographic images where the background IS the design.
+- **No transparency** for charts or diagrams with colored bands that would be damaged.
+- **Transparency** for character illustrations on light slides.
+- **Transparency** for icon/flow diagrams on light slides.
+- **Transparency** for any illustration with a distinct white background on
   a non-white slide.
 
 ## Naming consistently
@@ -81,13 +85,13 @@ the first place.
 ## Known failure modes
 
 A common Sonnet failure pattern is writing `IMAGE_PLAN.md` describing
-what would be generated, then advancing to Phase 7 without calling the
-MCP. This is NOT Phase 6 completion. The output of this phase is image
-files on disk, not a plan document.
+what would be generated, then advancing to Phase 7 without actually
+invoking `/generate-image`. This is NOT Phase 6 completion. The output
+of this phase is image files on disk, not a plan document.
 
 Another failure: generating images one-at-a-time sequentially. Four
-parallel calls per batch is explicit — do not serialize what the MCP
-supports concurrently.
+parallel invocations per batch is explicit — do not serialize what
+`/generate-image` supports concurrently.
 
 ## Image generation tips
 

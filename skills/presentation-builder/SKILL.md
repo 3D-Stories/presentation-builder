@@ -37,14 +37,11 @@ Then run:
 /reload-plugins
 ```
 
-**2. Replicate MCP** (required for AI image generation):
-```bash
-grep -q "replicate" ~/.claude/mcp.json 2>/dev/null
-```
-If not found, guide the user:
-> "Image generation requires Replicate MCP. You'll need a free API token from replicate.com/account/api-tokens. Paste your token and I'll configure everything."
+**2. `/generate-image` skill** (required for AI image generation):
+Image generation is delegated to the `/generate-image` skill. If the user's environment does not have it set up, guide them:
+> "Image generation is handled by the `/generate-image` skill. Run `/generate-image:setup` to configure it — you'll need a free Replicate API token from replicate.com/account/api-tokens. The setup skill handles MCP configuration."
 
-Read `references/setup.md` for the MCP configuration process.
+Read `references/setup.md` for the delegation details and Q8 fallback choices.
 
 **3. Review tools** (optional, enhances quality):
 - Check for `/bmad-party-mode` (Tier 1 review)
@@ -53,7 +50,7 @@ Read `references/setup.md` for the MCP configuration process.
 
 After first successful setup, create `~/.claude/.presentation-builder-setup-complete`
 so subsequent runs skip the check. This is global (not per-project) because the prerequisites
-(document-skills, Replicate MCP) are machine-level, not project-level.
+(document-skills, `/generate-image`) are machine-level, not project-level.
 
 ## Complexity Detection
 
@@ -184,11 +181,11 @@ For Complex presentations, use full multi-agent review. For Quick/Standard, an i
 
 ### Phase 6: Visual Generation
 
-**Hard prerequisite:** Replicate MCP configured and working AND Q8 ≠ `text-only`.
-If Replicate is absent, STOP (Phase 2 should have caught this — see setup re-entry path in `references/phase-2-requirements.md`).
+**Hard prerequisite:** `/generate-image` skill configured and working AND Q8 ≠ `text-only`.
+If `/generate-image` is absent, STOP (Phase 2 should have caught this — see setup re-entry path in `references/phase-2-requirements.md`).
 If Q8 = `text-only`, skip Phase 6 entirely and advance to Phase 7.
 
-Read `references/phase-6-visuals.md` and follow it end-to-end. This phase is not complete until `images/` contains one file per image in the style guide's plan. Writing `IMAGE_PLAN.md` without files on disk is a known failure mode — do not advance to Phase 7 in that state.
+Read `references/phase-6-visuals.md` and follow it end-to-end. Delegate all image generation to the `/generate-image` skill — do not call `mcp__replicate__*` tools directly from this skill. This phase is not complete until `images/` contains one file per image in the style guide's plan. Writing `IMAGE_PLAN.md` without files on disk is a known failure mode — do not advance to Phase 7 in that state.
 
 **Important:** This phase runs BEFORE implementation because build scripts reference image paths.
 

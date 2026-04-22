@@ -24,60 +24,44 @@ Then run these commands:
 
 Wait for reload to complete before continuing.
 
-### 2. Replicate MCP (for AI Image Generation)
+### 2. generate-image skill (for AI Image Generation)
 
 Required when Phase 2 Q8 (Visual Strategy) is `full` or `selective`.
 Skipped when Q8 = `text-only`.
 
-Check current state (both global and project-local):
+Image generation is delegated to the `/generate-image` skill, which owns
+Replicate MCP configuration and model selection. This skill does NOT
+configure Replicate directly — it relies on `/generate-image` being
+installed and set up.
+
+Check current state by looking for Replicate MCP tools (the
+`/generate-image` skill itself uses this check):
+
 ```bash
-grep -q "replicate" ~/.claude/mcp.json 2>/dev/null || { test -f .mcp.json && grep -q "replicate" .mcp.json 2>/dev/null; }
+# If mcp__replicate__ tools are visible, /generate-image is ready.
+# Otherwise, setup is needed.
 ```
 
-If missing, guide the user through setup:
+If `/generate-image` is not set up, tell the user:
 
-> "Image generation needs Replicate MCP. Here's what we need:
->
-> 1. Go to **replicate.com/account/api-tokens** and create a free API token
-> 2. Paste the token here and I'll configure everything
->
-> The token will be stored locally in `~/.claude/mcp.json` (never sent anywhere except Replicate).
-> The free tier is sufficient for most presentations (~50 images)."
+> "Image generation needs the `/generate-image` skill. Run
+> `/generate-image:setup` to configure it — you'll need a free Replicate
+> API token from replicate.com/account/api-tokens. The setup skill
+> handles MCP configuration for you."
 
-Once the user provides the token:
+After the user runs `/generate-image:setup`:
 
-1. Check if `~/.claude/mcp.json` exists.
-2. If it exists, read it and MERGE the replicate server config (don't overwrite other servers).
-3. If it doesn't exist, create it.
+> "Once `/generate-image:setup` completes, run `/mcp` to reconnect (or
+> restart Claude Code) and then continue with the presentation."
 
-**Config to add/merge:**
-
-```json
-{
-  "mcpServers": {
-    "replicate": {
-      "command": "npx",
-      "args": ["-y", "replicate-mcp-server"],
-      "env": {
-        "REPLICATE_API_TOKEN": "<USER_PROVIDED_TOKEN>"
-      }
-    }
-  }
-}
-```
-
-After writing the config:
-
-> "Replicate MCP configured. Run `/mcp` to reconnect, or restart Claude Code for the changes to take effect."
-
-**If the user declines to configure Replicate:**
+**If the user declines to configure `/generate-image`:**
 
 Do NOT proceed with a silent downgrade. The skill cannot produce AI-generated
-images without Replicate. Offer the user a concrete choice:
+images without `/generate-image`. Offer the user a concrete choice:
 
-> "Without Replicate MCP, the skill cannot generate AI images. I can either:
+> "Without `/generate-image` configured, the skill cannot generate AI images. I can either:
 > (a) Proceed with Q8 = `text-only` (native shapes/charts/typography only — no AI images), or
-> (b) Pause here so you can configure Replicate later and resume.
+> (b) Pause here so you can run `/generate-image:setup` later and resume.
 > Which would you prefer?"
 
 If the user chooses (a), change Q8 to `text-only` in the design spec and continue. If the user chooses (b), halt with the reason documented in the transcript.

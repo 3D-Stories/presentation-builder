@@ -46,11 +46,12 @@ Propose 2-3 structural approaches with trade-offs. Common patterns:
 (charts/shapes/icons built natively, no AI-generated imagery)?"
 - Choices: `full` (all slides get images), `selective` (specific slides only — the spec will list which), `text-only` (no AI images)
 - Thread the answer into the design spec's "Visual direction" section.
-- If answer is `full` or `selective` AND Replicate MCP is not yet configured,
-  pause Phase 2 and run the Replicate setup flow inline (see `setup.md`
-  step 2). Resume Phase 2 on successful setup. If user declines to configure
-  Replicate, offer to change Q8 to `text-only` — otherwise the skill cannot
-  proceed to Phase 6 and halts with an explanation.
+- If answer is `full` or `selective` AND the `/generate-image` skill is
+  not configured (no `mcp__replicate__` tools available), pause Phase 2
+  and ask the user to run `/generate-image:setup` (see `setup.md` step 2).
+  Resume Phase 2 on successful setup. If user declines, offer to change
+  Q8 to `text-only` — otherwise the skill cannot proceed to Phase 6 and
+  halts with an explanation.
 
 ### 2. Section Design (mechanical — enforceable)
 
@@ -127,10 +128,10 @@ Phase 2 is not complete until ALL of the following hold:
 2. Answers to Q1–Q8 are all recorded in the spec (including Q8 Visual Strategy).
 3. Every section has a labelled subsection with all 6 required fields.
 4. Cut plan is present (duration > 20 min) OR the line "Cut plan: not required (duration under 20min)" is present.
-5. If Q8 = `full` or `selective`: Replicate MCP is configured. Check BOTH locations:
-   - Global: `grep -q "replicate" ~/.claude/mcp.json 2>/dev/null`
-   - Project-local: `test -f .mcp.json && grep -q "replicate" .mcp.json 2>/dev/null`
-   Either path satisfies the condition. If neither, the user must configure Replicate or explicitly change Q8 to `text-only`.
+5. If Q8 = `full` or `selective`: the `/generate-image` skill is configured
+   (i.e., `mcp__replicate__*` tools are visible in the current session).
+   If they are not, the user must run `/generate-image:setup` or explicitly
+   change Q8 to `text-only`.
 
 A common Sonnet failure pattern is advancing to Phase 3 with condition
 (3), (4), or (5) unmet. Do not advance until all five conditions hold.
