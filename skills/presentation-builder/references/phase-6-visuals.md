@@ -1,4 +1,4 @@
-# Phase 8: Visual Generation
+# Phase 6: Visual Generation
 
 ## Purpose
 
