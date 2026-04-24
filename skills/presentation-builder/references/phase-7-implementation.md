@@ -36,7 +36,31 @@ Translates the style guide into code. Must include:
 - `addCard(slide, pres, { x, y, w, h, accentColor })` -- card with left accent border
 - `addStat(slide, { x, y, number, label, color })` -- big stat callout
 - `addCode(slide, pres, { x, y, w, h, code })` -- dark code block
+- `contrastCheck(fg, bg)` -- WCAG contrast ratio validation (see below)
 - Any recurring visual patterns from the style guide
+
+**Contrast validation function** (include in every theme.js):
+```javascript
+function contrastCheck(fg, bg) {
+  function luminance(hex) {
+    const r = parseInt(hex.slice(0, 2), 16) / 255;
+    const g = parseInt(hex.slice(2, 4), 16) / 255;
+    const b = parseInt(hex.slice(4, 6), 16) / 255;
+    const [rs, gs, bs] = [r, g, b].map(c =>
+      c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
+    );
+    return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+  }
+  const l1 = luminance(fg), l2 = luminance(bg);
+  const ratio = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+  if (ratio < 3) console.error(`CONTRAST FAIL: ${fg} on ${bg} = ${ratio.toFixed(2)}:1 (< 3:1, invisible)`);
+  else if (ratio < 4.5) console.warn(`CONTRAST WARN: ${fg} on ${bg} = ${ratio.toFixed(2)}:1 (< 4.5:1, fails WCAG AA)`);
+  return ratio;
+}
+```
+Call `contrastCheck` for every text color / background color pair defined
+in the `colors` object. Run these checks at build time (in `build.js`
+before generating slides) so warnings appear in the build output.
 
 ### slides-sN.js
 

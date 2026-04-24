@@ -252,24 +252,27 @@ A common Sonnet failure pattern is reviewing code without running the build. Do 
 
 ### Phase 9: Build & Iterate
 
-Run the build script to generate the presentation file:
+Read `references/phase-9-build.md` for the detailed process, including post-build PPTX
+validation (media count, format verification, contrast check, speaker notes check).
 
-```bash
-cd build-deck && node build.js
-```
+**Summary:** Run the build, then validate the generated file structurally. For PPTX, unzip
+and inspect: verify media count matches the image plan, check for 0-byte files, validate
+image formats via magic bytes (catches WebP-as-PNG), and verify speaker notes exist on every
+slide. Run contrast validation on all text/background combinations.
 
 **Phase-complete gate:** Phase 9 is NOT complete until:
 
 1. The output file exists at the expected path (e.g., `output.pptx`).
 2. The output file size exceeds the minimum threshold:
-   - PPTX: ≥ 10 KB
-   - PDF: ≥ 5 KB
-   - DOCX: ≥ 5 KB
-   - HTML: ≥ 5 KB
-3. The slide count in the output matches the spec's total slide count
-   (pptxgenjs' built-in assertion in `build.js` covers this; parse the
-   generated file for other formats if needed).
+   - PPTX: >= 10 KB
+   - PDF: >= 5 KB
+   - DOCX: >= 5 KB
+   - HTML: >= 5 KB
+3. The slide count matches the spec's total slide count.
 4. The build invocation is recorded in the transcript (exit code captured).
+5. **(PPTX only)** Post-build validation passed — no 0-byte media, no format mismatches,
+   no contrast ratio below 3:1.
+6. Any Must-fix validation failures have been resolved and the build re-run.
 
 NOTE: Phase 7's build gate partially overlaps this one — that is
 intentional. Phase 7 requires the build was made to work during
@@ -279,11 +282,11 @@ edits. Belt-and-suspenders redundancy is deliberate for Sonnet reliability.
 A common Sonnet failure pattern is declaring Phase 9 complete based on
 build scripts existing rather than on actually running them. Do NOT skip
 the build invocation — the build script must execute and produce a file
-on disk that passes the size and slide-count checks.
+on disk that passes the size, slide-count, AND structural validation checks.
 
 Iterate based on user feedback using the iteration protocol below.
 
-**Outputs:** Final presentation file.
+**Outputs:** Final validated presentation file.
 
 ## Iteration Protocol
 
