@@ -7,10 +7,49 @@ This is the most important phase -- shift-left means spending the most effort he
 
 ## Process
 
-### 0. Detect template analysis
+### 0. Detect prior context
 
-Before starting questions, check if `template-analysis.md` exists at the
-project root (produced by Phase 0). If it does:
+Before starting Q1-Q8, check for context from earlier phases or
+from the rawgentic:setup workflow. This avoids re-asking questions the
+user has already answered.
+
+**0a. Rawgentic brainstorm context:**
+
+Check if a design spec already exists at `docs/superpowers/specs/`:
+
+```bash
+ls docs/superpowers/specs/*-design.md 2>/dev/null
+```
+
+If a spec exists (produced by `superpowers:brainstorm` during
+rawgentic:setup Sub-flow C), read it and extract any answers that
+overlap with Q1-Q8:
+
+| Spec content | Maps to | Pre-fill as |
+|-------------|---------|-------------|
+| Project goal / primary objective | Q1 (Primary Takeaway) | Default suggestion |
+| Target audience / users described | Q2 (Audience) | Default suggestion |
+| Timing / duration mentioned | Q3 (Duration) | Default suggestion |
+| Structure / section outline | Q4 (Structure) + Q5 (Topics) | Default suggestion |
+| Demo / interactive mentions | Q6 (Demos) | Default suggestion |
+| Output format mentioned | Q7 (Format) | Default suggestion |
+
+For each pre-filled answer, present it as a confirmation rather than an
+open question:
+
+> "From your earlier brainstorm, it looks like the primary takeaway is
+> [extracted]. Is that right, or would you like to change it?"
+
+This collapses a full question into a yes/no confirmation. Only ask the
+full open-ended question if the spec doesn't contain relevant context.
+
+Q8 (Visual Strategy) is always asked fresh — the rawgentic brainstorm
+doesn't cover image generation preferences.
+
+**0b. Template analysis:**
+
+Check if `template-analysis.md` exists at the project root (produced by
+Phase 0). If it does:
 
 1. Read the extracted color palette and font families.
 2. Use them as **defaults** in Q-series questions — present the template
@@ -20,7 +59,10 @@ project root (produced by Phase 0). If it does:
    — e.g., "Your template includes a dark gradient background and a
    primary logo. Want to reuse these?"
 
-If `template-analysis.md` does not exist, proceed normally.
+**0c. No prior context:**
+
+If neither a rawgentic brainstorm spec nor template analysis exists,
+proceed with the full Q1-Q8 sequence as normal.
 
 ### 1. Core Questions (One at a Time)
 
