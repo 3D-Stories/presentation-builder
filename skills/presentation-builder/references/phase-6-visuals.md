@@ -93,6 +93,34 @@ Another failure: generating images one-at-a-time sequentially. Four
 parallel invocations per batch is explicit — do not serialize what
 `/generate-image` supports concurrently.
 
+## AI vs. programmatic generation (decision matrix)
+
+Not every visual should be AI-generated. AI image models hallucinate
+text — word clouds, labeled diagrams, charts with data labels, and
+anything where exact text matters will contain fabricated words.
+
+| Visual type | Method | Why |
+|-------------|--------|-----|
+| Word clouds | **Programmatic** (d3-cloud / wordcloud2) | AI hallucinates words |
+| Charts / graphs | **Programmatic** (chart.js / d3) | Data accuracy required |
+| Labeled diagrams | **Programmatic** (SVG / HTML canvas) | Text must be exact |
+| Timelines with dates | **Programmatic** | Dates/labels must be accurate |
+| Icons / illustrations | **AI** (`/generate-image`) | No text content to corrupt |
+| Hero backgrounds | **AI** (`/generate-image`) | Atmospheric, no text needed |
+| Abstract patterns | **AI** (`/generate-image`) | Decorative, no accuracy requirement |
+
+When Phase 4 (style guide) defines image prompts, tag each image with
+`method: ai` or `method: programmatic`. Phase 7 builds programmatic
+visuals as part of the build script; Phase 6 generates AI images only.
+
+## Image format requirements
+
+When invoking `/generate-image` for pptxgenjs builds, always request
+**PNG** output. Never request WebP — pptxgenjs has limited WebP support
+and PowerPoint may fail to display it. If `/generate-image` returns a
+WebP file (check magic bytes, not extension), convert to PNG before
+proceeding.
+
 ## Image generation tips
 
 - **Be specific** in prompts: "a gold trophy with two handles" not "an award".

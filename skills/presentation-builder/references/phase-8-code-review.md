@@ -92,11 +92,12 @@ build failure in prior evaluations.
    Any `ShapeType.XXX` reference in the build-deck whose name doesn't
    appear in that output is a Must-fix.
 
-2. **Image path references match disk.** Every `addImage({ path: ... })`
-   reference must resolve to an actual file. Cross-check the
-   build-deck's `addImage` calls against `ls images/` output. If Phase 6
-   produced `01-title-hero.jpg` but the build script references
-   `01-hero.jpg`, the build fails with `ENOENT`.
+2. **Image references match disk.** Every image referenced in the
+   build-deck must exist on disk. Cross-check `addImage` calls against
+   `ls images/` output. If Phase 6 produced `01-title-hero.jpg` but
+   the build script references `01-hero.jpg`, the build fails with
+   `ENOENT`. (Note: gotcha #7 covers WHY `data` is preferred over
+   `path` — this gotcha covers filename accuracy regardless of method.)
 
 3. **Hex color format.** pptxgenjs expects `"0891B2"` (no `#` prefix).
    `"#0891B2"` is silently ignored or renders wrong.
@@ -115,6 +116,33 @@ build failure in prior evaluations.
    on the rendered slide. Either replace with the real number or
    remove the slide/bullet entirely. Do not ship `[TODO]`, `[TBD]`,
    or `[placeholder]` text on finished decks.
+
+7. **Image loading method.** Every `addImage` call should use `data`
+   (base64 URI), NOT `path`. The `path` property resolves relative to
+   the PPTX output location and fails silently — images appear as
+   broken placeholders with no error thrown. Grep for `addImage.*path`
+   in the build-deck. Any match is a Must-fix. The `imgData()` helper
+   in `phase-7-implementation.md` is the canonical pattern.
+
+8. **Image sizing with base64.** `sizing: { type: 'contain' }` is
+   incompatible with base64 `data` URIs — images render blank. Grep
+   for `contain` in the build-deck near any `addImage` call. Use
+   `cover` or explicit `w`/`h` dimensions instead.
+
+9. **Image format matches extension.** AI image tools may return WebP
+   files saved with a `.png` extension. PowerPoint cannot display
+   these. For each file in `images/`, check the first 4 bytes:
+   ```bash
+   for f in images/*; do printf "%s: " "$f"; xxd -l 4 -p "$f"; done
+   ```
+   PNG starts with `89504e47`, JPEG with `ffd8ff`, WebP with
+   `52494646`. A `.png` file whose magic bytes are `52494646` is
+   actually WebP and must be converted before build.
+
+10. **No WebP files in the build.** pptxgenjs has limited WebP
+    support. All images embedded in the PPTX should be PNG or JPEG.
+    Grep `images/` for `.webp` files and check magic bytes of all
+    files regardless of extension (see gotcha #9).
 
 Mark each gotcha PASS/FAIL in the Phase 8 review log. A gotcha-level
 FAIL is always a Must-fix.
