@@ -113,12 +113,45 @@ In all cases, maintain the modular principle -- separate files per section.
 
 ## Common pptxgenjs Pitfalls
 
+### Colors & Shapes
 - **NEVER use `#` in hex colors** -- causes file corruption
 - **NEVER encode opacity in hex strings** (8-char hex) -- use `opacity` property
 - **NEVER reuse option objects** -- pptxgenjs mutates them. Use factory functions.
+- **`rectRadius` only works with `roundRect`** not `rect`. If you want rounded
+  corners, use `addShape(pres.ShapeType.roundRect, { rectRadius: 0.2, ... })`.
+
+### Text
 - **Use `bullet: true`** not unicode `•` -- causes double bullets
 - **Use `breakLine: true`** between text array items
-- **`rectRadius` only works with `ROUNDED_RECTANGLE`** not `RECTANGLE`
+
+### Images (critical -- most common source of silent failures)
+- **NEVER use `path` for local images.** The `path` property resolves
+  relative to the PPTX output location and fails silently (broken
+  placeholder, no error). Always use base64 `data` URIs:
+  ```javascript
+  // theme.js helper
+  function imgData(filePath) {
+    const buf = require('fs').readFileSync(filePath);
+    const magic = buf.slice(0, 4).toString('hex').toUpperCase();
+    let mime = 'image/png';
+    if (magic.startsWith('FFD8FF')) mime = 'image/jpeg';
+    else if (magic.startsWith('52494646')) mime = 'image/webp'; // should not happen -- see below
+    return `data:${mime};base64,${buf.toString('base64')}`;
+  }
+  ```
+  Then use: `slide.addImage({ data: imgData('images/01-hero.png'), x, y, w, h })`
+- **NEVER use `sizing: { type: 'contain' }` with base64 `data`.** Images
+  render blank. Use `cover` or set explicit `w`/`h` dimensions instead.
+- **Always validate image format via magic bytes, not file extension.**
+  AI image tools (Recraft, Replicate bg-removal) may return WebP files
+  saved with a `.png` extension. PowerPoint cannot display these.
+  Magic bytes: PNG = `89504E47`, JPEG = `FFD8FF`, WebP = `52494646...57454250`.
+  If a `.png` file is actually WebP, convert it before embedding.
+- **Always use PNG or JPEG for pptxgenjs, never WebP.** When invoking
+  `/generate-image`, explicitly request PNG output. If a WebP file
+  appears in `images/`, convert it with sharp/ImageMagick before build.
+
+### General
 - **Test build after every change** -- don't batch multiple untested changes
 
 ## Key Principles
