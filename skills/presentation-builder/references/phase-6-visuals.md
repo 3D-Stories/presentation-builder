@@ -121,6 +121,32 @@ and PowerPoint may fail to display it. If `/generate-image` returns a
 WebP file (check magic bytes, not extension), convert to PNG before
 proceeding.
 
+## Cost tracking
+
+Track cumulative Replicate API costs during image generation. After each
+`/generate-image` invocation, log the model used and estimated cost:
+
+| Model | Approx. cost per image |
+|-------|----------------------|
+| Nano Banana 2 | ~$0.01-0.02 |
+| FLUX Schnell | ~$0.003-0.01 |
+| Background removal | ~$0.01-0.02 |
+
+After all images are generated, print a cost summary:
+
+```
+Image Generation Cost Summary
+=============================
+Images generated: 7
+  - AI generated: 5 (Nano Banana 2)
+  - Background removed: 3
+  - Programmatic: 2 (no API cost)
+Estimated total: ~$0.13
+```
+
+This is informational — do not block on cost. Present the summary to the
+user after Phase 6 completes so they have visibility into API usage.
+
 ## Image generation tips
 
 - **Be specific** in prompts: "a gold trophy with two handles" not "an award".
