@@ -7,6 +7,21 @@ This is the most important phase -- shift-left means spending the most effort he
 
 ## Process
 
+### 0. Detect template analysis
+
+Before starting questions, check if `template-analysis.md` exists at the
+project root (produced by Phase 0). If it does:
+
+1. Read the extracted color palette and font families.
+2. Use them as **defaults** in Q-series questions — present the template
+   colors as the recommended palette and the template fonts as the
+   recommended typography. The user can still override.
+3. Reference specific template assets when discussing visual strategy (Q8)
+   — e.g., "Your template includes a dark gradient background and a
+   primary logo. Want to reuse these?"
+
+If `template-analysis.md` does not exist, proceed normally.
+
 ### 1. Core Questions (One at a Time)
 
 Ask these questions one per message, in order. Use multiple choice where possible.

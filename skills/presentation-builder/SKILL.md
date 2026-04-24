@@ -77,6 +77,9 @@ The workflow has three user-facing stages with internal phases. At each check-in
 progress indicator so the user always knows where they are.
 
 ```
+STAGE 0: TEMPLATE (conditional — only when user provides a branded PPTX)
+  Phase 0: Template Analysis ───→ template-analysis.md + template-assets/
+
 STAGE 1: DISCOVERY
   Phase 1: Research & Gather ──→ MATERIALS_INDEX.md
   Phase 2: Requirements ────────→ Presentation design spec
@@ -106,6 +109,7 @@ If invoked in a directory with existing presentation artifacts, detect partial p
 
 | If this exists... | Resume from... |
 |-------------------|----------------|
+| `template-analysis.md` only | Phase 1 (Research) or Phase 2 (Requirements) |
 | `MATERIALS_INDEX.md` only | Phase 2 (Requirements) |
 | Design spec in `docs/superpowers/specs/` | Phase 3 (Review) |
 | `style-guide.md` | Phase 5 (Design Review) or Phase 6 (Visuals) |
@@ -117,6 +121,20 @@ Present what was found and ask: "It looks like you have a presentation in progre
 pick up where you left off, or start fresh?"
 
 ## Phase Details
+
+### Phase 0: Template Analysis (conditional)
+
+Read `references/phase-0-template.md` for the detailed process.
+
+**Summary:** When the user provides an existing branded PPTX template, extract colors, fonts,
+and media assets from it. Unzip the PPTX, parse `ppt/theme/theme1.xml` for the color scheme
+and font families, copy `ppt/media/*` to `template-assets/`, rename assets to semantic names,
+and generate `template-analysis.md` at the project root.
+
+**When to run:** Ask during initial setup whether the user has a branded PPTX template. If yes,
+run Phase 0 before Phase 1. If no template, skip entirely.
+
+**Outputs:** `template-analysis.md` + `template-assets/` directory with renamed assets.
 
 ### Phase 1: Research & Gather
 
