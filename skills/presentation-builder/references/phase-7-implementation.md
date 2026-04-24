@@ -178,6 +178,86 @@ In all cases, maintain the modular principle -- separate files per section.
 ### General
 - **Test build after every change** -- don't batch multiple untested changes
 
+## Font availability check
+
+pptxgenjs silently substitutes fonts when the specified font is not
+installed on the build machine. Add a check to `build.js` that runs
+before slide generation:
+
+```javascript
+const { execFileSync } = require('child_process');
+
+function checkFont(fontName) {
+  try {
+    const installed = execFileSync('fc-list', [':' , 'family'], { encoding: 'utf8' });
+    if (!installed.toLowerCase().includes(fontName.toLowerCase())) {
+      console.warn(`FONT WARNING: "${fontName}" not found on this system.`);
+      console.warn(`  pptxgenjs will silently substitute a default font.`);
+      console.warn(`  Install it, or update theme.js with a fallback.`);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    return true; // fc-list not available (Windows), skip check
+  }
+}
+
+// Run at build start
+const { fonts } = require('./theme');
+checkFont(fonts.title);
+checkFont(fonts.body);
+```
+
+Define a fallback chain in `theme.js` for each brand font:
+
+```javascript
+const fonts = {
+  title: 'Rubik',         // brand font
+  titleFallback: 'Arial', // safe fallback if brand font unavailable
+  body: 'Rubik',
+  bodyFallback: 'Calibri',
+  code: 'Consolas',
+};
+```
+
+The build script should warn but not fail — font substitution is cosmetic,
+not a broken build. The user can install the font or accept the fallback.
+
+## Template-aware generation
+
+When Phase 0 has extracted a template (`template-analysis.md` exists),
+the build can optionally inject slides into the original template PPTX
+rather than generating a standalone file.
+
+**pptxgenjs limitation:** pptxgenjs does not natively support opening an
+existing PPTX and adding slides to it. The workaround is:
+
+1. Build the presentation with pptxgenjs as normal (standalone).
+2. Use the extracted template colors/fonts/assets so the output visually
+   matches the template.
+3. If exact template master slides are required (e.g., corporate footer,
+   logo placement enforced by the template's slide layouts), document
+   this as a **manual post-processing step**: open both files in
+   PowerPoint, copy slides from the generated deck into the template.
+
+**Alternative approach (python-pptx):** If the user needs true
+template-aware generation (injecting slides into the template file
+directly), suggest using python-pptx instead of pptxgenjs. python-pptx
+can open an existing PPTX and add slides using its slide layouts:
+
+```python
+from pptx import Presentation
+prs = Presentation('template.pptx')
+layout = prs.slide_layouts[1]  # Use template's layout
+slide = prs.slides.add_slide(layout)
+# ... add content using template placeholders
+prs.save('output.pptx')
+```
+
+This is a separate code path — do not mix pptxgenjs and python-pptx in
+the same build. If the user requests template-aware generation, confirm
+which approach they prefer before Phase 7 begins.
+
 ## Key Principles
 
 - **Modular** -- one file per section, always

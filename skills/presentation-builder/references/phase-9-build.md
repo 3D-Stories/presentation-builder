@@ -130,7 +130,77 @@ A contrast ratio below 3:1 is a **Must-fix** (text is effectively
 invisible). A ratio between 3:1 and 4.5:1 is a **Should-fix** (readable
 but fails WCAG AA).
 
-### 4. Iterate
+### 4. Export speaker notes as rehearsal document
+
+After a successful build, generate a standalone markdown file with all
+speaker notes for print-ready rehearsal:
+
+```javascript
+// Add to build.js after writeFile, or as a separate export-notes.js script
+const fs = require('fs');
+let notes = '# Speaker Notes — Rehearsal Script\n\n';
+pres.slides.forEach((slide, i) => {
+  const title = slide._slideObjects.find(o => o.options && o.options.placeholder === 'title');
+  const titleText = title ? title.text : `Slide ${i + 1}`;
+  notes += `## Slide ${i + 1}: ${titleText}\n\n`;
+  notes += (slide._speakerNotes || '_No notes_') + '\n\n---\n\n';
+});
+fs.writeFileSync('speaker-notes.md', notes);
+console.log('Speaker notes exported to speaker-notes.md');
+```
+
+The exported file should include slide numbers, titles, full notes text,
+and `---` separators between slides. This is optional — offer it to the
+user after the first successful build:
+
+> "I can also export your speaker notes as a standalone `speaker-notes.md`
+> for rehearsal. Would you like that?"
+
+### 5. HTML preview (optional, for faster iteration)
+
+The edit→build→open PowerPoint→check cycle is slow. For faster visual
+iteration, generate a lightweight HTML preview alongside the PPTX:
+
+```javascript
+// preview.js — run after build.js
+const fs = require('fs');
+const { colors, fonts } = require('./theme');
+
+function generatePreview(slides) {
+  let html = `<!DOCTYPE html><html><head>
+    <style>
+      body { font-family: ${fonts.body}, sans-serif; max-width: 960px; margin: 0 auto; }
+      .slide { border: 1px solid #ccc; margin: 20px 0; padding: 40px;
+               aspect-ratio: 16/9; position: relative; overflow: hidden; }
+      .slide.dark { background: #${colors.primary}; color: #${colors.lightText}; }
+      .slide.light { background: #${colors.contentBg}; color: #${colors.darkText}; }
+      .slide h2 { margin-top: 0; }
+      .notes { background: #fffde7; padding: 10px; font-size: 12px;
+               border-left: 3px solid #ffc107; margin-top: 10px; }
+    </style></head><body><h1>Slide Preview</h1>`;
+
+  slides.forEach((s, i) => {
+    html += `<div class="slide ${s.dark ? 'dark' : 'light'}">
+      <h2>Slide ${i + 1}: ${s.title}</h2>
+      <div>${s.content || ''}</div>
+    </div>`;
+    if (s.notes) html += `<div class="notes">${s.notes}</div>`;
+  });
+
+  html += '</body></html>';
+  fs.writeFileSync('preview.html', html);
+  console.log('Preview written to preview.html — open in browser');
+}
+```
+
+This preview is NOT a substitute for the PPTX build — it's a quick
+visual check during iteration. Offer it when the user is making
+incremental changes:
+
+> "Want me to generate an HTML preview so you can check layout in a
+> browser instead of reopening PowerPoint each time?"
+
+### 6. Iterate
 
 After validation passes, present the output to the user. Iterate based on
 feedback using the modular architecture — content changes touch one
