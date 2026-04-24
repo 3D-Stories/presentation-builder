@@ -64,6 +64,14 @@ Focus on:
   for the "good notes (speakable script)" standard.
 - **pptxgenjs API gotchas** (see checklist below) — each one has been
   observed to ship undetected by a less-rigorous Phase 8 review.
+- **Contrast validation** — verify the build script calls `contrastCheck()`
+  for all text/background pairs. Any ratio < 3:1 is a Must-fix. See
+  `references/phase-7-implementation.md` for the `contrastCheck` function.
+- **Post-build validation readiness** — verify the build script or a
+  companion validation script implements the checks from
+  `references/phase-9-build.md` (media count, 0-byte detection, format
+  validation, speaker notes). Phase 9 will run these checks on the output
+  file — but Phase 8 should confirm the code to perform them exists.
 
 ## pptxgenjs API gotcha checklist (PPTX format only)
 
