@@ -8,9 +8,34 @@ deck from a collection of slides.
 
 ## Process
 
+### 0. Check for template analysis
+
+Before offering palette choices, check if `template-analysis.md` exists at
+the project root (produced by Phase 0).
+
+If it exists:
+1. Read the extracted color palette and font families.
+2. **Pre-populate** the style guide's color palette (step 1) and typography
+   (step 2) from the template data instead of offering generic options.
+3. Present the pre-populated values to the user: "Your template uses
+   [font] for titles and [font] for body text, with [hex] as the primary
+   accent. I'll use these in the style guide — let me know if you want
+   to change anything."
+4. Skip the "Suggested palettes" table below — the template IS the palette.
+5. Reference extracted assets in the visual motifs section (step 5) —
+   e.g., if the template has a diagonal stripe pattern, use it as a
+   recurring motif.
+
+If `template-analysis.md` does not exist, proceed with the standard
+palette selection below.
+
 ### 1. Choose a Color Palette
 
 Pick colors that match the TOPIC, not generic blue. Consider the audience and setting.
+
+**If template colors are available** (from step 0), use those directly and
+skip the suggested palettes. Only offer the table below as alternatives
+if the user wants to deviate from their brand.
 
 Suggested palettes (or create a custom one):
 
@@ -32,6 +57,10 @@ Define roles for each color:
 
 ### 2. Define Typography
 
+If `template-analysis.md` exists, use the extracted majorFont for titles
+and minorFont for body text. Fill in the table with those fonts and verify
+the user is happy with them before proceeding.
+
 | Element | Font | Size | Weight |
 |---------|------|------|--------|
 | Slide title | ... | 36-44pt | Bold |
@@ -41,7 +70,8 @@ Define roles for each color:
 | Stats/big numbers | ... | 54-60pt | Bold |
 | Captions | ... | 10-12pt | Regular |
 
-Use system-safe fonts unless the user specifies custom ones.
+Use system-safe fonts unless the user specifies custom ones or a template
+analysis provides brand fonts.
 
 ### 3. Define Slide Structure Patterns
 
